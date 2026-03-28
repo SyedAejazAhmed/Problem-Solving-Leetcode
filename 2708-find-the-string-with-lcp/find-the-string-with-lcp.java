@@ -1,73 +1,47 @@
-import java.util.*;
-
 class Solution {
+
     public String findTheString(int[][] lcp) {
         int n = lcp.length;
+        char[] word = new char[n];
+        char current = 'a';
 
-        // Step 1: Validate diagonal
+        // construct the string starting from 'a' to 'z' sequentially
         for (int i = 0; i < n; i++) {
-            if (lcp[i][i] != n - i) return "";
-        }
-
-        // Step 2: DSU (Union-Find)
-        int[] parent = new int[n];
-        for (int i = 0; i < n; i++) parent[i] = i;
-
-        // Find
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (lcp[i][j] > 0) {
-                    union(parent, i, j);
-                }
-            }
-        }
-
-        // Step 3: Assign characters
-        char[] res = new char[n];
-        Map<Integer, Character> map = new HashMap<>();
-        char ch = 'a';
-
-        for (int i = 0; i < n; i++) {
-            int root = find(parent, i);
-            if (!map.containsKey(root)) {
-                if (ch > 'z') return "";
-                map.put(root, ch++);
-            }
-            res[i] = map.get(root);
-        }
-
-        // Step 4: Validate LCP
-        int[][] computed = new int[n][n];
-
-        for (int i = n - 1; i >= 0; i--) {
-            for (int j = n - 1; j >= 0; j--) {
-                if (res[i] == res[j]) {
-                    if (i + 1 < n && j + 1 < n)
-                        computed[i][j] = 1 + computed[i + 1][j + 1];
-                    else
-                        computed[i][j] = 1;
-                } else {
-                    computed[i][j] = 0;
-                }
-
-                if (computed[i][j] != lcp[i][j]) {
+            if (word[i] == 0) {
+                if (current > 'z') {
                     return "";
                 }
+                word[i] = current;
+                for (int j = i + 1; j < n; j++) {
+                    if (lcp[i][j] > 0) {
+                        word[j] = word[i];
+                    }
+                }
+                current++;
             }
         }
 
-        return new String(res);
-    }
+        // verify if the constructed string meets the LCP matrix requirements
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = n - 1; j >= 0; j--) {
+                if (word[i] != word[j]) {
+                    if (lcp[i][j] != 0) {
+                        return "";
+                    }
+                } else {
+                    if (i == n - 1 || j == n - 1) {
+                        if (lcp[i][j] != 1) {
+                            return "";
+                        }
+                    } else {
+                        if (lcp[i][j] != lcp[i + 1][j + 1] + 1) {
+                            return "";
+                        }
+                    }
+                }
+            }
+        }
 
-    private int find(int[] parent, int x) {
-        if (parent[x] != x)
-            parent[x] = find(parent, parent[x]);
-        return parent[x];
-    }
-
-    private void union(int[] parent, int a, int b) {
-        int pa = find(parent, a);
-        int pb = find(parent, b);
-        if (pa != pb) parent[pa] = pb;
+        return new String(word);
     }
 }
