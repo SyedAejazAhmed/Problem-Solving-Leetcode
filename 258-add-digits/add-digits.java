@@ -1,12 +1,12 @@
 class Solution {
     public int addDigits(int num) {
-        if(num<10){
+        if (num<10){
             return num;
+        }else if(num%9==0){
+            return 9;
+        }else{
+            return num%9;
         }
-        int d = num%10;
-        num = num/10;
-        int ans = addDigits(num);
-        return addDigits(ans+d);
         
     }
 }
