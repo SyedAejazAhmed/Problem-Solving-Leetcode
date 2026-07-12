@@ -8,9 +8,9 @@ class Solution:
                 first = l
                 last = r
                 break
-            elif nums[l]<target:
+            if nums[l]<target:
                 l+=1
-            else: #nums[r]>target:
+            if nums[r]>target:
                 r-=1
         return first,last
             
